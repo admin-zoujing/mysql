@@ -12,7 +12,7 @@ mysql for 5.7
 mysql> CREATE USER 'springdev'@'host' IDENTIFIED BY 'springdev_mysql';
 mysql>create database springdev  default charset 'utf8mb4';
 授权test用户拥有testDB数据库的所有权限（某个数据库的所有权限）：
-mysql>grant all privileges on springdev.* to test@localhost identified by 'springdev_mysql';
+mysql>grant all privileges on springdev.* to springdev@localhost identified by 'springdev_mysql';
 mysql>flush privileges;
 
 mysql导入导出sql文件
