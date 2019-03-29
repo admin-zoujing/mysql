@@ -600,9 +600,7 @@ MySQL SQL_MODE: SQL模式
 
 
 练习题：
-
 新建如下表（包括结构和内容）：
-
 ID    Name          Age     Gender     Course
 1     Ling Huchong   24      Male       Hamogong
 2     Huang Rong    19      Female     Chilian Shenzhang
@@ -702,9 +700,6 @@ MySQL多表查询和子查询：
 	别名：
 		表别名
 		字段别名
-
-
-
 
 
 		练习：导入hellodb.sql，完成以下题目：
@@ -2090,4 +2085,3 @@ tcp src port 110
 tcpdump -i eth0 -s0 -nn -XX tcp dst port 3306 and dst host 192.168.10.16 
 
 Mroonga（http://mroonga.org/）
-
