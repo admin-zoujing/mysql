@@ -20,7 +20,7 @@ echo "Begin backup all Single Database........"
 for Database in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD -e "show databases" | sed "1d"`
 do
         echo "Databases  backup Need wait...."
-        /usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST $Database --lock-all-tables  --flush-logs --master-data=2 > $Database-"$time".sql
+        /usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST $Database --lock-all-tables --master-data=2 > $Database-"$time".sql
 done
 echo "single database ok............"
 
