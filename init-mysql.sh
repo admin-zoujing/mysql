@@ -66,6 +66,7 @@ datadir = /usr/local/mysql/data
 tmpdir = /tmp
 user = mysql
 log-error = /usr/local/mysql/logs/mysql.log
+slow_query_log = ON
 #server-id = 1 
 #log-bin = mysql-bin
 #binlog-format=ROW
