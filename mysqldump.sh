@@ -71,7 +71,7 @@ crontab -l
 
 #mysql之mysqldump恢复
 #注意恢复之前的准备工作：
-#1、备份文件拷贝到一个文件夹，防止出错后无法二次恢复（全备文件和二进制日志文件）
+#1、备份文件拷贝到一个文件夹，防止出错后无法二次恢复（全备文件和二进制日志文件，权限及属主）
 #2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
 #3、恢复全备点：/usr/local/mysql/bin/mysql -uroot -pRoot_123456*0987 < $Database-"$time".sql
 #4、查找备份点：less $Database-"$time".sql
