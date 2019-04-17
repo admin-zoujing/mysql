@@ -63,3 +63,7 @@ cat >> /etc/crontab <<EOF
 EOF
 crontab /etc/crontab
 crontab -l
+
+# -E, --events：  备份指定库的事件调度器
+# -R, --routines：备份存储过程和存储函数；
+# --triggers：    备份触发器
