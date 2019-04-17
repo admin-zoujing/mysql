@@ -9,6 +9,7 @@ chown -R mysql:mysql /home/mysql
 
 echo '#!/bin/bash
 DIR=/home/mysql/dump/mysqldump
+USER=root
 PASSWD=Root_123456*0987
 HOST=localhost
 time=`date +"%Y%m%d"`
