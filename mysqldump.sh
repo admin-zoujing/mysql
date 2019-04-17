@@ -27,10 +27,10 @@ echo "single database ok............"
 echo "Database Full table backup............."
 for db in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD -h$HOST -e "show databases"|sed "1d"`
 do
-        mkdir -pv $db
+        mkdir -pv $db-"$time"
         for tables in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD $db -e "show tables"|sed "1d"`
         do
-                /usr/local/mysql/bin/mysqldump  -h$HOST -u$USER -p$PASSWD $db $tables --master-data=2 > $db/$tables
+                /usr/local/mysql/bin/mysqldump  -h$HOST -u$USER -p$PASSWD $db $tables --master-data=2 > $db-"$time"/$tables
         done
 done
 
