@@ -75,5 +75,5 @@ crontab -l
 #2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
 #3、恢复全备点：/usr/local/mysql/bin/mysql -uroot -pRoot_123456*0987 < $Database-"$time".sql
 #4、查找备份点：less $Database-"$time".sql
-#5、恢复二进制：mysqlbinlog --start-position=235 [--database=test] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
-#               mysqlbinlog --start-datetime="2019-04-17 22:01:08" [--database=test] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
+#5、恢复二进制：mysqlbinlog --no-defaults --start-position=235 [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
+#               mysqlbinlog --no-defaults --start-datetime="2019-04-17 22:01:08" [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
