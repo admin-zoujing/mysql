@@ -67,3 +67,12 @@ crontab -l
 # -E, --events：  备份指定库的事件调度器
 # -R, --routines：备份存储过程和存储函数；
 # --triggers：    备份触发器
+
+#mysql之mysqldump恢复
+#注意恢复之前的准备工作：
+#1、备份文件拷贝到一个文件夹，防止出错后无法二次恢复（全备文件和二进制日志文件）
+#2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
+#3、恢复全备点：/usr/local/mysql/bin/mysql -uroot -pRoot_123456*0987 < $Database-"$time".sql
+#4、查找备份点：less $Database-"$time".sql
+#5、恢复二进制：mysqlbinlog --start-position=235 [--database=test] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
+#               mysqlbinlog --start-datetime="2019-04-17 22:01:08" [--database=test] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
