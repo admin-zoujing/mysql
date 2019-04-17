@@ -19,7 +19,7 @@ echo "Begin backup all Single Database........"
 for Database in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD -e "show databases" | sed "1d"`
 do
         echo "Databases  backup Need wait...."
-        /usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST $Database --lock-all-tables  --flush-logs  > $Database-"$time".sql
+        /usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST $Database --lock-all-tables  --flush-logs --master-data=2 > $Database-"$time".sql
 done
 echo "single database ok............"
 
@@ -29,12 +29,12 @@ do
         mkdir -pv $db
         for tables in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD $db -e "show tables"|sed "1d"`
         do
-                /usr/local/mysql/bin/mysqldump  -h$HOST -u$USER -p$PASSWD $db $tables > $db/$tables
+                /usr/local/mysql/bin/mysqldump  -h$HOST -u$USER -p$PASSWD $db $tables --master-data=2 > $db/$tables
         done
 done
 
 echo "Full databases backup............."
-/usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST --all-databases --lock-all-tables  --flush-logs --events  > all-"$time".sql
+/usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST --all-databases --lock-all-tables  --flush-logs --events --master-data=2 > all-"$time".sql
 if [[ $? == 0 ]];then
         echo "mysql backup Success"
 else
