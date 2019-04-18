@@ -45,11 +45,11 @@ fi
 cd "$fulldir/$dateformat"
 echo "Begin backup full Database........"
  innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --no-timestamp --host=127.0.0.1 $fulldir/$dateformat > $fulldir/$dateformat/fullbackup.log 2>&1 &
- sleep 5
+ sleep 2
 echo "full database ok............" 
 
 #***********需要修改要删除的数据库开头名称************#
-before=`date -d "2 day ago" +"%Y%m%d"`
+before=`date -d "7 day ago" +"%Y%m%d"`
 fullbackupdata="$fulldir"/"$before"
 
 if [ -d $fullbackupdata ] ;then
@@ -77,7 +77,7 @@ if [ ! -d $Increment/$dateFull ]; then
         cd "$Increment/$dateFull"
         echo "Begin The first incremental backup of a week is full backup........"
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$dateFull --incremental-basedir=$fulldir/$fullfilename > $Increment/$dateFull/incre-oneday.log 2>&1 &
-        sleep 5
+        sleep 2
         echo "The first incremental backup of a week is full backup ok............" 
 fi
 
@@ -87,7 +87,7 @@ if [ -d $Increment/$dateFull/$datetime ]; then
         fileName=`ls -lt $Increment | sed -n 2p | cut -d" " -f10`
         echo "Begin Incremental backups from the first incremental backups........."
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$fileName/$dateIncre --incremental-basedir=$Increment/$fileName >> $Increment/$fileName/incre-twohour.log  2>&1 &
-        sleep 5
+        sleep 2
         echo "Incremental backups from the first incremental backups ok............" 
 fi
 
