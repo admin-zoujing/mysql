@@ -15,6 +15,8 @@ HOST=localhost
 time=`date +"%Y%m%d"`
 
 cd "$DIR"
+mkdir -pv "$time"
+cd "$time"
 /usr/local/mysql/bin/mysql -u$USER -p$PASSWD -e "show databases" | sed "1d"
 echo "Begin backup all Single Database........"
 for Database in `/usr/local/mysql/bin/mysql -u$USER -p$PASSWD -e "show databases" | sed "1d"`
@@ -35,7 +37,7 @@ do
 done
 
 echo "Full databases backup............."
-/usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST --all-databases --lock-all-tables  --flush-logs --events --master-data=2 > all-"$time".sql
+/usr/local/mysql/bin/mysqldump  -u$USER -p$PASSWD -h$HOST --all-databases --lock-all-tables  --flush-logs --events  --master-data=2 > all-"$time".sql
 if [[ $? == 0 ]];then
         echo "mysql backup Success"
 else
@@ -44,15 +46,13 @@ fi
 
 #***********需要修改要删除的数据库开头名称************#
 before=`date -d "2 day ago" +"%Y%m%d"`
-mysqlsql="$DIR"/mysql-$before.sql
-testsql="$DIR"/test-$before.sql
-performance_schemasql="$DIR"/performance_schema-$before.sql
+expirebackup="$DIR"/$before
 
-if [ -f $mysqlsql ] ;then
-        rm -rf $mysqlsql
-        rm -rf $testsql
-        rm -rf $performance_schemasql
-        exit 1
+#删除目录
+if [ -d $expirebackup ] ;then
+        rm -rf $expirebackup
+else
+        echo "Not 2 day ago expirebackup"
 fi
 ' > /home/mysql/mysqldump.sh
 chmod a+x /home/mysql/mysqldump.sh
