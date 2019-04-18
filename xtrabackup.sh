@@ -73,7 +73,7 @@ Increment=/home/mysql/dump/increment
 # The first incremental backup of a week is full backup.
 if [ ! -d $Increment/$dateFull ]; then
         mkdir -pv $Increment/$dateFull
-        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d" " -f9`
+        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d" " -f10`
         cd "$Increment/$dateFull"
         echo "Begin The first incremental backup of a week is full backup........"
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$dateFull --incremental-basedir=$fulldir/$fullfilename > $Increment/$dateFull/incre-oneday.log 2>&1 &
@@ -84,7 +84,7 @@ fi
 # Incremental backups from the first incremental backups.
 if [ -d $Increment/$dateFull/$datetime ]; then
         cd $Increment/$dateFull
-        fileName=`ls -lt $Increment | sed -n 2p | cut -d" " -f9`
+        fileName=`ls -lt $Increment | sed -n 2p | cut -d" " -f10`
         echo "Begin Incremental backups from the first incremental backups........."
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$fileName/$dateIncre --incremental-basedir=$Increment/$fileName >> $Increment/$fileName/incre-twohour.log  2>&1 &
         sleep 5
