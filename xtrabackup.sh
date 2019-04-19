@@ -45,8 +45,23 @@ fi
 cd "$fulldir/$dateformat"
 echo "Begin backup full Database........"
  innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --no-timestamp --host=127.0.0.1 $fulldir/$dateformat > $fulldir/$dateformat/fullbackup.log 2>&1 &
- sleep 2
-echo "full database ok............" 
+
+ while true; do
+   installRes=`tail -1 $fulldir/$dateformat/fullbackup.log |cut -d " " -f 3-4`
+   if   [[ "${installRes}" = "completed OK!" ]];then
+            echo "full database ok............" 
+            sleep 10
+            break
+   elif [[ "${installRes}" = "completed OK!" ]];then
+            echo "full database ok............" 
+            sleep 10
+            break
+   else
+         sleep 10
+         continue
+   fi
+done
+
 
 #***********需要修改要删除的数据库开头名称************#
 before=`date -d "7 day ago" +"%Y%m%d"`
@@ -66,35 +81,57 @@ User=root
 PassWord=Root_123456*0987
 dateFull=`date +"%Y%m%d"`
 dateIncre=`date +"%Y%m%d_%H%M%S"`
-
 fulldir=/home/mysql/dump/full
 Increment=/home/mysql/dump/increment
-
 # The first incremental backup of a week is full backup.
 if [ ! -d $Increment/$dateFull ]; then
         mkdir -pv $Increment/$dateFull
-        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d" " -f10`
+        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d " " -f 9`
         cd "$Increment/$dateFull"
         echo "Begin The first incremental backup of a week is full backup........"
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$dateFull --incremental-basedir=$fulldir/$fullfilename > $Increment/$dateFull/incre-oneday.log 2>&1 &
-        sleep 2
-        echo "The first incremental backup of a week is full backup ok............" 
-fi
+        while true; do
+          installRes=`tail -1 $Increment/$dateFull/incre-oneday.log |cut -d " " -f 3-4`
+          if   [[ "${installRes}" = "completed OK!" ]];then
+               echo "The first incremental backup of a week is full backup ok............" 
+               sleep 10
+               break
+         elif [[ "${installRes}" = "completed OK!" ]];then
+              echo "The first incremental backup of a week is full backup ok............" 
+              sleep 10
+              break
+        else
+         sleep 10
+         continue
+       fi
+       done
 
+fi
 # Incremental backups from the first incremental backups.
 if [ -d $Increment/$dateFull/$datetime ]; then
         cd $Increment/$dateFull
-        fileName=`ls -lt $Increment | sed -n 2p | cut -d" " -f10`
+        fileName=`ls -lt $Increment | sed -n 2p | cut -d " " -f 9`
         echo "Begin Incremental backups from the first incremental backups........."
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$fileName/$dateIncre --incremental-basedir=$Increment/$fileName >> $Increment/$fileName/incre-twohour.log  2>&1 &
-        sleep 2
-        echo "Incremental backups from the first incremental backups ok............" 
+        while true; do
+          installRes=`tail -1 $Increment/$fileName/incre-twohour.log |cut -d " " -f 3-4`
+          if   [[ "${installRes}" = "completed OK!" ]];then
+               echo "Incremental backups from the first incremental backups ok............" 
+               sleep 10
+               break
+         elif [[ "${installRes}" = "completed OK!" ]];then
+              echo "Incremental backups from the first incremental backups ok............" 
+              sleep 10
+              break
+        else
+         sleep 10
+         continue
+       fi
+       done
 fi
-
 #***********需要修改要删除的数据库开头名称************#
 before=`date -d "2 day ago" +"%Y%m%d"`
 Incrementdata="$Increment"/"$before"
-
 if [ -d $Incrementdata ] ;then
         rm -rf $Incrementdata
         exit 1
