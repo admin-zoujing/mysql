@@ -86,7 +86,7 @@ Increment=/home/mysql/dump/increment
 # The first incremental backup of a week is full backup.
 if [ ! -d $Increment/$dateFull ]; then
         mkdir -pv $Increment/$dateFull
-        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d " " -f 9`
+        fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d " " -f 10`
         cd "$Increment/$dateFull"
         echo "Begin The first incremental backup of a week is full backup........"
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$dateFull --incremental-basedir=$fulldir/$fullfilename > $Increment/$dateFull/incre-oneday.log 2>&1 &
@@ -110,7 +110,7 @@ fi
 # Incremental backups from the first incremental backups.
 if [ -d $Increment/$dateFull/$datetime ]; then
         cd $Increment/$dateFull
-        fileName=`ls -lt $Increment | sed -n 2p | cut -d " " -f 9`
+        fileName=`ls -lt $Increment | sed -n 2p | cut -d " " -f 10`
         echo "Begin Incremental backups from the first incremental backups........."
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$fileName/$dateIncre --incremental-basedir=$Increment/$fileName >> $Increment/$fileName/incre-twohour.log  2>&1 &
         while true; do
@@ -167,13 +167,19 @@ crontab -l
 #还原数据
 #systemctl daemon-reload && systemctl stop mysqld && netstat -lanput |grep 3306
 #rm -rf /var/lib/mysql/*
-#整合完整备份和增量备份：注意：一定要按照完整备份、第一次增量备份、第二次增量备份的顺序进行整合，在整合最后一次增量备份时不要使用–redo-only参数
-#innobackupex --apply-log --redo-only /data/db_backup/2017-08-02_13-43-38/
-#innobackupex --apply-log --redo-only /data/db_backup/2017-08-02_13-43-38/ --incremental-dir=/data/db_backup/2017-08-02_13-49-29/
-#innobackupex --apply-log /data/db_backup/2017-08-02_13-43-38/ --incremental-dir=/data/db_backup/2017-08-02_13-52-59/ 
-#innobackupex --apply-log /data/db_backup/2017-08-02_13-43-38/
-#开始还原
-#innobackupex --copy-back /data/db_backup/2017-08-02_13-43-38/
-#chown -R mysql.mysql /var/lib/mysql 
-#systemctl daemon-reload && systemctl restart mysqld && netstat -lanput |grep 3306
-#mysql -uroot -pRoot_123456*0987 -e 'select * from Yang.T1;'
+
+
+
+#注意恢复之前的准备工作：
+#1、备份文件拷贝到一个文件夹，防止出错后无法二次恢复（全备文件和二进制日志文件，权限及属主）
+#2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
+#3、整合完整备份和增量备份：
+    #注意：一定要按照完整备份、第一次增量备份、第二次增量备份的顺序进行整合，在整合最后一次增量备份时不要使用–redo-only参数
+    #innobackupex --apply-log --redo-only /home/mysql/dump/full/20190419/
+    #innobackupex --apply-log --redo-only /home/mysql/dump/full/20190419/ --incremental-dir=/data/db_backup/2017-08-02_13-49-29/
+    #innobackupex --apply-log /home/mysql/dump/full/20190419/ --incremental-dir=/data/db_backup/2017-08-02_13-52-59/ 
+    #innobackupex --apply-log /home/mysql/dump/full/20190419/
+    #开始还原
+    #innobackupex --copy-back /data/db_backup/2017-08-02_13-43-38/
+#4、恢复二进制：mysqlbinlog --no-defaults --start-position=235 [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
+#               mysqlbinlog --no-defaults --start-datetime="2019-04-17 22:01:08" [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
