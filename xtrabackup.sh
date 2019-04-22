@@ -84,22 +84,22 @@ dateIncre=`date +"%Y%m%d_%H%M%S"`
 fulldir=/home/mysql/dump/full
 Increment=/home/mysql/dump/increment
 Increment-twohour=/home/mysql/dump/increment-twohour
-# The first incremental backup of a week is full backup.
+# The every day incremental backup of a week is full backup.
 if [ ! -d $Increment/$dateFull ]; then
         rm -rf  $Increment/*
         mkdir -pv $Increment/$dateFull
         fullfilename=`ls -lt $fulldir | sed -n 2p | cut -d " " -f 10`
         cd "$Increment/$dateFull"
-        echo "Begin The first incremental backup of a week is full backup........"
+        echo "Begin The every day incremental backup of a week is full backup........"
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment/$dateFull --incremental-basedir=$fulldir/$fullfilename > $Increment/$dateFull/incre-oneday.log 2>&1 &
         while true; do
           installRes=`tail -1 $Increment/$dateFull/incre-oneday.log |cut -d " " -f 3-4`
           if   [[ "${installRes}" = "completed OK!" ]];then
-               echo "The first incremental backup of a week is full backup ok............" 
+               echo "The every day incremental backup of a week is full backup ok............" 
                sleep 10
                break
          elif [[ "${installRes}" = "completed OK!" ]];then
-              echo "The first incremental backup of a week is full backup ok............" 
+              echo "The every day incremental backup of a week is full backup ok............" 
               sleep 10
               break
         else
@@ -109,21 +109,21 @@ if [ ! -d $Increment/$dateFull ]; then
        done
 fi
 
-# Incremental backups from the first incremental backups.
+# The incremental backups from the every day incremental backups.
 if [ ! -d $Increment-twohour/$dateFull ]; then
         rm -rf $Increment-twohour/*
         mkdir -pv $Increment-twohour/$dateFull
         fileName=`ls -lt $Increment | sed -n 2p | cut -d " " -f 10`
-        echo "Begin Incremental backups from the first incremental backups........."
-        innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment-twohour/$dateFull --incremental-basedir=$Increment/$fileName > $Increment-twohour/$dateFull/incre-twohour.log  2>&1 &
+        echo "Begin The two hour incremental backups from the every day incremental backups........."
+        innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment-twohour/$dateFull --incremental-basedir=$Increment/$fileName > $Increment-twohour/$dateFull/incre-firsttwohour.log  2>&1 &
         while true; do
-          installRes=`tail -1 $Increment-twohour/$dateFull/incre-twohour.log |cut -d " " -f 3-4`
+          installRes=`tail -1 $Increment-twohour/$dateFull/incre-firsttwohour.log |cut -d " " -f 3-4`
           if   [[ "${installRes}" = "completed OK!" ]];then
-               echo "Incremental backups from the first incremental backups ok............" 
+               echo "The two hour incremental backups from the every day incremental backups ok............" 
                sleep 10
                break
          elif [[ "${installRes}" = "completed OK!" ]];then
-              echo "Incremental backups from the first incremental backups ok............" 
+              echo "The two hour incremental backups from the every day incremental backups ok............" 
               sleep 10
               break
         else
@@ -137,16 +137,16 @@ fi
 if [ -d $Increment-twohour/$dateFull ]; then
         mkdir -pv $Increment-twohour/$dateIncre
         fileName=`ls -lt $Increment | sed -n 2p | cut -d " " -f 10`
-        echo "Begin Incremental backups from the first incremental backups........."
+        echo "Begin Incremental backups from the first two hour incremental backups........."
         innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=$User --password=$PassWord --use-memory=1024MB --no-timestamp --host=127.0.0.1 --incremental $Increment-twohour/$dateIncre --incremental-basedir=$Increment/$fileName > $Increment-twohour/$dateIncre/incre-twohour.log  2>&1 &
         while true; do
           installRes=`tail -1 $Increment-twohour/$dateIncre/incre-twohour.log |cut -d " " -f 3-4`
           if   [[ "${installRes}" = "completed OK!" ]];then
-               echo "Incremental backups from the first incremental backups ok............" 
+               echo "Incremental backups from the first two hour incremental backups ok............" 
                sleep 10
                break
          elif [[ "${installRes}" = "completed OK!" ]];then
-              echo "Incremental backups from the first incremental backups ok............" 
+              echo "Incremental backups from the first two hour incremental backups ok............" 
               sleep 10
               break
         else
@@ -183,9 +183,6 @@ crontab -l
 #mysql -uroot -pRoot_123456*0987 -e 'insert into Yang.T1 values(2000);'
 #第二次增量备份：第二次备份的–incremental-basedir参数应指向第一次增量备份的时间戳目录
 #innobackupex --password=Root_123456*0987 --incremental /data/db_backup/ --incremental-basedir=/data/db_backup/2017-08-02_13-49-29/
-#还原数据
-#systemctl daemon-reload && systemctl stop mysqld && netstat -lanput |grep 3306
-#rm -rf /var/lib/mysql/*
 
 
 #注意恢复之前的准备工作：
@@ -193,11 +190,14 @@ crontab -l
 #2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
 #3、整合完整备份和增量备份：
     #注意：一定要按照完整备份、第一次增量备份、第二次增量备份的顺序进行整合，在整合最后一次增量备份时不要使用–redo-only参数
-    #innobackupex --apply-log --redo-only /home/mysql/dump/full/20190419/
-    #innobackupex --apply-log --redo-only /home/mysql/dump/full/20190419/ --incremental-dir=/home/mysql/dump/increment/20190419/
-    #innobackupex --apply-log /home/mysql/dump/full/20190419/ --incremental-dir=/home/mysql/dump/increment-twohour/20190419_161703
-    #innobackupex --apply-log /home/mysql/dump/full/20190419/
+    #innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=root --password=Root_123456*0987 --apply-log --redo-only /home/mysql/dump/full/20190420/
+    #innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=root --password=Root_123456*0987 --apply-log --redo-only /home/mysql/dump/full/20190420/ --incremental-dir=/home/mysql/dump/increment/20190422/
+    #innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=root --password=Root_123456*0987 --apply-log /home/mysql/dump/full/20190420/ --incremental-dir=/home/mysql/dump/increment-twohour/20190422_085026
+    #innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=root --password=Root_123456*0987 --apply-log /home/mysql/dump/full/20190420/
     #开始还原
-    #innobackupex --copy-back /home/mysql/dump/full/20190419/
+    #rm -rf /usr/local/mysql/data/*
+    #innobackupex --defaults-file=/usr/local/mysql/conf/my.cnf --user=root --password=Root_123456*0987 --host=127.0.0.1 --port=3306 --copy-back --socket=/usr/local/mysql/logs/mysql.sock /home/mysql/dump/full/20190420  
+    #chown -R mysql:mysql /usr/local/mysql
+    #systemctl restart mysqld.service 
 #4、恢复二进制：mysqlbinlog --no-defaults --start-position=235 [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
 #               mysqlbinlog --no-defaults --start-datetime="2019-04-19 22:01:08" [--database=test --set-charset=utf8mb4] mysql-bin.00001 | mysql -uroot -pRoot_123456*0987 [test]
