@@ -184,7 +184,6 @@ crontab -l
 #第二次增量备份：第二次备份的–incremental-basedir参数应指向第一次增量备份的时间戳目录
 #innobackupex --password=Root_123456*0987 --incremental /data/db_backup/ --incremental-basedir=/data/db_backup/2017-08-02_13-49-29/
 
-
 #注意恢复之前的准备工作：
 #1、备份文件拷贝到一个文件夹，防止出错后无法二次恢复（全备文件和二进制日志文件，权限及属主）
 #2、关闭二进制日志文件（注释配置文件二进制日志记录，重启mysql）
