@@ -45,13 +45,11 @@ mysql> show variables like "%tmp%";
 | tmp_table_size | 16777216 |
 | tmpdir | /tmp |
 +-------------------+----------+
-4 rows in set (0.00 sec)
+
 
 解决办法：调整临时表大小
-
 1）进mysql终端命令修改，加上global,下次进mysql就会生效
 mysql> set global tmp_table_size=33554432;
-Query OK, 0 rows affected (0.00 sec)
 
 再次登陆mysql
 mysql> show variables like "%tmp%";
@@ -63,7 +61,6 @@ mysql> show variables like "%tmp%";
 | tmp_table_size | 33554432 |
 | tmpdir | /tmp |
 +-------------------+----------+
-4 rows in set (0.01 sec)
 
 2）my.cnf配置文件修改
 [root@www ~]# vim my.cnf
@@ -81,7 +78,6 @@ Id User Host db Command Time State Info
 一般是睡眠连接过多，严重消耗mysql服务器资源(主要是cpu, 内存)，并可能导致mysql崩溃。
 
 解决办法 ：
-
 在mysql的配置my.cnf文件中，有一项wait_timeout参数设置.即可设置睡眠连接超时秒数，如果某个连接超时，会被mysql自然终止。 
 wait_timeout过大有弊端，其体现就是MySQL里大量的SLEEP进程无法及时释放，拖累系统性能，不过也不能把这个指设置的过小，否则你可能会遭遇到“MySQL has gone away”之类的问题。
 通常来说，把wait_timeout设置为10小时是个不错的选择，但某些情况下可能也会出问题，比如说有一个CRON脚本，其中两次SQL查询的间隔时间大于10秒的话，那么这个设置就有问题了（当然，这也不是不能解决的问题，你可以在程序里时不时mysql_ping一下，以便服务器知道你还活着，重新计算wait_timeout时间）：
@@ -95,7 +91,6 @@ mysql> show variables like 'wait_timeout';
 +---------------+-------+
 | wait_timeout | 28800 |
 +---------------+-------+
-1 row in set (0.00 sec)
 
 28800seconds，也就是8小时。
 如果在wait_timeout秒期间内，数据库连接(java.sql.Connection)一直处于等待状态，mysql就将该连接关闭。这时，你的Java应用的连接池仍然合法地持有该连接的引用。当用该连接来进行数据库操作时，就碰到上述错误。
@@ -104,6 +99,5 @@ mysql> show variables like 'wait_timeout';
 
 比如将其改成30天
 mysql> set global wait_timeout=124800;
-Query OK, 0 rows affected (0.00 sec)
 
-以上这篇Mysql占用过高CPU时的优化手段(必看)就是小编分享给大家的全部内容了，希望能给大家一个参考，也希望大家多多支持脚本之家。
+
